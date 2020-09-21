@@ -15,21 +15,33 @@ function buildT(data) {
         });
     });
 }
-function onClick(){
+var filters = {}
+function updateFilters(){
     d3.event.preventDefault(); //don't refresh when click
 
-//get datetime value from the filter
-    var date = d3.select("#datetime").property("value");
-    let filterData = tableData
-// was the date entered? filter data using that date
-    if (date) {
-    // apply filter to only keep data rows that match the input
-        filterData = filterData.filter(row => row.datetime === date);}
-    // then rebuild the table using that filter
-    buildT(filterData);
-    }   
-//attach an event to listen for the form button
-d3.selectAll("#filter-btn").on("click", onClick);
+//element, value, id of filter
+    var newEl = d3.select(this).select("input");
+    var elVal = newEl.property("value");
+    var filtID = newEl.attr("id");
+// if filter val changed, add the ID and val to the filters list. else clear the filter from the filters list
+    if (elVal) {
+        filters[filtID] = elVal;}
+    else {
+        delete filters[filtID]
+    }
+    filterTable();
+       
+function filterTable() {
+    let filtData = tableData;
+    //loop through filters keeping data matching current values
+    Object.entries(filters)forEach(([attr,value]) => {
+    filtData = filtData.filter(row=>row[attr]===value)
+    });
+    buildT(filtData); //rebuild table
+}
+
+//attach an event to listen for changes to any filter
+d3.selectAll(".filter").on("change", updateFilters);
 
 
 //build the table when the page loads
